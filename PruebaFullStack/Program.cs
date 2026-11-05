@@ -1,32 +1,45 @@
+
 using Microsoft.EntityFrameworkCore;
 using PruebaFullStack.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
+// Base de datos
 builder.Services.AddDbContext<PruebaFullStack.Data.AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-
+// Servicios
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<ComentarioService>();
 
+// CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AngularPolicy", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Swagger
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
+// Configuración HTTP
 app.UseHttpsRedirection();
+
+app.UseCors("AngularPolicy");
 
 app.UseAuthorization();
 
