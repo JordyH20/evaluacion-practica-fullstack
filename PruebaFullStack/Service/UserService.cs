@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PruebaFullStack.Data;
 using PruebaFullStack.DTOs.Request;
+using PruebaFullStack.DTOs.Response;
 using PruebaFullStack.Models;
 
 namespace PruebaFullStack.Service
@@ -28,15 +29,31 @@ namespace PruebaFullStack.Service
             await _context.SaveChangesAsync();
         }
 
-        public async Task<List<Usuario>> GetAllUsersAsync()
+        public async Task<List<UserResponse>> GetAllUsersAsync()
         {
-            return await _context.Usuarios.ToListAsync();
+            var users = await _context.Usuarios.ToListAsync();
+            return users.Select(u => new UserResponse
+            {
+                Id = u.Id,
+                Nombre = u.Nombre,
+                Correo = u.Correo,
+                Rol = u.Rol
+            }).ToList();
         }
 
 
-        public async Task<Usuario?> GetUserByIdAsync(int id)
+        public async Task<UserResponse?> GetUserByIdAsync(int id)
         {
-            return await _context.Usuarios.FindAsync(id);
+            var user = await _context.Usuarios.FindAsync(id);
+            if (user == null) return null;
+
+            return new UserResponse
+            {
+                Id = user.Id,
+                Nombre = user.Nombre,
+                Correo = user.Correo,
+                Rol = user.Rol
+            };
         }
 
 
